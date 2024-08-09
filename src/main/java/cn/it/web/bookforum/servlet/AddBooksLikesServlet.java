@@ -8,21 +8,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-@WebServlet("/addbookslikes")
+@WebServlet("/AddBooksLikes")
 public class AddBooksLikesServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private BookServiceJdbc bookService = new BookServiceJdbc();
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/inputNumber.html").forward(request, response);
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            int number = Integer.parseInt(request.getParameter("number"));
+            int number = Integer.parseInt(request.getParameter("search"));
 
             Class.forName("org.postgresql.Driver");
             bookService.addBookLikes(number);
