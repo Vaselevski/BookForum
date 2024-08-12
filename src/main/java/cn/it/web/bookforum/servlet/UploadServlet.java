@@ -38,7 +38,6 @@ public class UploadServlet extends HttpServlet {
             return;
         }
 
-        //
         String uploadPath = "C:\\Code\\BookForum\\src\\main\\resources";
 
         File uploadDir = new File(uploadPath);
