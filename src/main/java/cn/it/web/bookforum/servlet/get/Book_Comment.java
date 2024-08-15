@@ -1,47 +1,41 @@
-package cn.it.web.bookforum.servlet;
-
-
-import cn.it.web.bookforum.comment.Comments;
+package cn.it.web.bookforum.servlet.get;
+import cn.it.web.bookforum.comment.Comment;
 import cn.it.web.bookforum.comment.CommentsServiceJdbc;
-import cn.it.web.bookforum.user.UserServiceJdbc;
-import cn.it.web.bookforum.user.Users;
+import cn.it.web.bookforum.common.URLParser;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.List;
-
-@WebServlet("/Show")
-public class ShowServlet extends HttpServlet {
+//回传的*应该是要获得评论的书籍的ID
+@WebServlet("/Book/Comment/*")
+public class Book_Comment extends HttpServlet {
     private CommentsServiceJdbc commentsService = new CommentsServiceJdbc();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession(false);
-        Integer bookId = (Integer) session.getAttribute("bookId");
-        List<Comments> comment;
+        URLParser urlParser = new URLParser();
+        Integer bookID = Integer.valueOf(urlParser.extractContentAfterString(req, "/Book/Comment"));
+        List<Comment> comments;
         try {
-            Class.forName("org.postgresql.Driver");
-            comment = commentsService.searchCommentsByLikes(bookId);
-        } catch (ClassNotFoundException e) {
+            comments = commentsService.searchCommentsByTime(bookID);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         Gson gson = new Gson();
-        String jsonComments = gson.toJson(comment);
+        String jsonBook = gson.toJson(comments);
 
 
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
         PrintWriter out = resp.getWriter();
-        out.print(jsonComments);
+        out.print(jsonBook);
         out.flush();
-
-
     }
 }

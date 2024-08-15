@@ -1,6 +1,7 @@
 plugins {
   id("java")
   id("war")
+  kotlin("jvm")
 }
 
 group = "cn.it.web.bookforum"
@@ -22,10 +23,16 @@ dependencies {
   implementation("com.google.code.gson:gson:2.11.0")
   implementation("commons-fileupload:commons-fileupload:1.5")
   implementation("commons-io:commons-io:2.16.1")
+  implementation("org.mindrot:jbcrypt:0.4")
+  implementation("org.java-websocket:Java-WebSocket:1.5.7")
   testImplementation(platform("org.junit:junit-bom:5.10.0"))
   testImplementation("org.junit.jupiter:junit-jupiter")
+  implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.test {
   useJUnitPlatform()
+}
+kotlin {
+  jvmToolchain(21)
 }

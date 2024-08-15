@@ -1,6 +1,6 @@
 package cn.it.web.bookforum.comment;
 
-import cn.it.web.bookforum.common.DatabaseConfig;
+import cn.it.web.bookforum.common.DatabaseConnectionPool;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,140 +11,143 @@ public class CommentsServiceJdbc implements CommentsService {
 
     //need to pass in a comments object with user_id,book_id, and comment properties
     @Override
-    public void addComment(Comments comment) throws SQLException {
-        String sql = "INSERT INTO comments (user_id,book_id,comment) VALUES (?, ?, ?)";
+    public void addComment(Comment comment) throws SQLException {
+        String sql = "INSERT INTO comments (user_id,username,parent_comment_id,book_id,comment) VALUES (?,?,?,?,?)";
+        Connection connection=DatabaseConnectionPool.getInstance().getConnection();
 
-        try (Connection connection = DriverManager.getConnection(DatabaseConfig.URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setInt(1, comment.getUserId());
-            preparedStatement.setInt(2, comment.getBookId());
-            preparedStatement.setString(3, comment.getComment());
-
-            preparedStatement.executeUpdate();
-            System.out.println("Comment added successfully.");
+            preparedStatement.setString(2, comment.getUsername());
+            preparedStatement.setInt(3, comment.getParentCommentId());
+            preparedStatement.setInt(4, comment.getBookId());
+            preparedStatement.setString(5, comment.getComment());
+            int rowsAffected= preparedStatement.executeUpdate();
+            if(rowsAffected==0){
+                System.out.println("add comment failed");
+            }
         } catch (SQLException e) {
             System.err.println("SQL Error: " + e.getMessage());
             throw e;
+        }finally {
+            if (connection != null) {
+                DatabaseConnectionPool.getInstance().releaseConnection(connection);
+            }
         }
     }
 
     @Override
     public void deleteComment(int id) throws SQLException {
         String sql = "DELETE FROM comments WHERE id = ?";
+        Connection connection=DatabaseConnectionPool.getInstance().getConnection();
 
-        try (Connection connection = DriverManager.getConnection(DatabaseConfig.URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-
-            preparedStatement.setObject(1, id);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, id);
             int rowsAffected = preparedStatement.executeUpdate();
-
             if (rowsAffected == 0) {
                 System.out.println("No book found with the specified ID.");
-            }else{
-                System.out.println("Book deleted successfully.");
-            }
-
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-            throw e;
-        }
-    }
-
-    @Override
-    public void likesComment(int id) throws SQLException {
-            String sql = "UPDATE comments SET likes_count = likes_count + 1 WHERE id = ?";
-        try (Connection connection = DriverManager.getConnection(DatabaseConfig.URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1,id);
-
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Increase likescount successfully.");
-            } else {
-                System.out.println("Increase likescount failed.");
             }
         } catch (SQLException e) {
             System.err.println("SQL Error: " + e.getMessage());
             throw e;
-        }
-
-    }
-
-    @Override
-    public void dislikesComment(int id) throws SQLException {
-        String sql = "UPDATE comments SET dislikes_count = dislikes_count + 1 WHERE id = ?";
-        try (Connection connection = DriverManager.getConnection(DatabaseConfig.URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-
-            preparedStatement.setInt(1,id);
-
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Increase dislikescount successfully.");
-            } else {
-                System.out.println("Increase dielikescouont failed.");
+        }finally {
+            if (connection != null) {
+                DatabaseConnectionPool.getInstance().releaseConnection(connection);
             }
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-            throw e;
         }
-
     }
 
     @Override
-    public List<Comments> searchCommentsByLikes(int id) {
-        List<Comments> comments = new ArrayList<>();
-        String sql = "SELECT * FROM comments WHERE book_id = ? order by(likes_count - dislikes_count) DESC ";
+    public List<Comment> searchCommentsByLikes(int id) throws SQLException {
+        List<Comment> comments = new ArrayList<>();
+        String sql = "SELECT * FROM comments WHERE book_id = ? order by comment_likes_count DESC ";
+        Connection connection=DatabaseConnectionPool.getInstance().getConnection();
 
-        try (Connection connection = DriverManager.getConnection(DatabaseConfig.URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setInt(1, id);
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
-                Comments comment=new Comments();
-                comment.setId(rs.getInt("id"));
+                Comment comment=new Comment();
+                comment.setCommentId(rs.getInt("id"));
                 comment.setUserId(rs.getInt("user_id"));
+                comment.setUsername(rs.getString("username"));
+                comment.setParentCommentId(rs.getInt("parent_comment_id"));
                 comment.setBookId(rs.getInt("book_id"));
-                comment.setCreateAt(rs.getTimestamp("create_at"));
-                comment.setDislikesCount(rs.getInt("dislikes_count"));
-                comment.setLikesCount(rs.getInt("likes_count"));
+                comment.setCommentCreateAt(rs.getTimestamp("comment_create_at"));
+                comment.setCommentLikesCount(rs.getInt("comment_likes_count"));
                 comment.setComment(rs.getString("comment"));
                 comments.add(comment);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("SQL Error: " + e.getMessage());
+        }finally {
+             if (connection != null) {
+                DatabaseConnectionPool.getInstance().releaseConnection(connection);
+            }
         }
         return comments;
     }
 
     @Override
-    public List<Comments> searchCommentsByTime(int id) {
-        List<Comments> comments = new ArrayList<>();
-        String sql = "SELECT * FROM comments WHERE book_id = ? order by(create_at) DESC ";
+    public List<Comment> searchCommentsByTime(int id) throws SQLException {
+        List<Comment> comments = new ArrayList<>();
+        String sql = "SELECT * FROM comments WHERE book_id = ? order by comment_create_at DESC  ";
+        Connection connection=DatabaseConnectionPool.getInstance().getConnection();
 
-        try (Connection connection = DriverManager.getConnection(DatabaseConfig.URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
-                Comments comment=new Comments();
-                comment.setId(rs.getInt("id"));
+                Comment comment=new Comment();
+                comment.setCommentId(rs.getInt("id"));
                 comment.setUserId(rs.getInt("user_id"));
+                comment.setUsername(rs.getString("username"));
+                comment.setParentCommentId(rs.getInt("parent_comment_id"));
                 comment.setBookId(rs.getInt("book_id"));
-                comment.setCreateAt(rs.getTimestamp("create_at"));
-                comment.setDislikesCount(rs.getInt("dislikes_count"));
-                comment.setLikesCount(rs.getInt("likes_count"));
+                comment.setCommentCreateAt(rs.getTimestamp("comment_create_at"));
+                comment.setCommentLikesCount(rs.getInt("comment_likes_count"));
                 comment.setComment(rs.getString("comment"));
                 comments.add(comment);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("SQL Error: " + e.getMessage());
+        }finally {
+            if (connection != null) {
+                DatabaseConnectionPool.getInstance().releaseConnection(connection);
+            }
         }
         return comments;
     }
+
+    @Override
+    public Comment getComment(int id) throws SQLException {
+        String sql = "SELECT * FROM comments WHERE id = ?";
+        Connection connection=DatabaseConnectionPool.getInstance().getConnection();
+        Comment comment=new Comment();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, id);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                comment.setCommentId(rs.getInt("id"));
+                comment.setUserId(rs.getInt("user_id"));
+                comment.setUsername(rs.getString("username"));
+                comment.setParentCommentId(rs.getInt("parent_comment_id"));
+                comment.setBookId(rs.getInt("book_id"));
+                comment.setCommentCreateAt(rs.getTimestamp("comment_create_at"));
+                comment.setCommentLikesCount(rs.getInt("comment_likes_count"));
+                comment.setComment(rs.getString("comment"));
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        } finally {
+            if (connection != null) {
+                DatabaseConnectionPool.getInstance().releaseConnection(connection);
+            }
+        }
+        return comment;
+    }
+
 }

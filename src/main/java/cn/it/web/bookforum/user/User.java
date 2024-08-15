@@ -2,60 +2,66 @@ package cn.it.web.bookforum.user;
 
 import java.sql.Timestamp;
 
-public class Users {
-    private int id;
+public class User {
+    private int userId;
     private String username;
     private String password;
-    private Timestamp lastLoginTime;
     private Timestamp createAt;
     private boolean isAdmin;
 
-    public int getId() {
-        return id;
+    // 默认构造函数
+    public User() {
     }
-    public void setId(int id) {
-        this.id = id;
+
+    // Getter 和 Setter 方法
+    public int getUserId() {
+        return userId;
     }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
+
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
-    public Timestamp getLastLoginTime() {
-        return lastLoginTime;
-    }
-    public void setLastLoginTime(Timestamp lastLoginTime) {
-        this.lastLoginTime = lastLoginTime;
-    }
+
     public Timestamp getCreateAt() {
         return createAt;
     }
+
     public void setCreateAt(Timestamp createAt) {
         this.createAt = createAt;
     }
-    public void setIsAdmin(boolean isAdmin) {
-        this.isAdmin = isAdmin;
-    }
-    public boolean GetIsAdmin() {
+
+    public boolean isAdmin() {
         return isAdmin;
     }
+
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
     @Override
     public String toString() {
-        return "Users {" +
-                "id=" + id +
+        return "User{" +
+                "userId=" + userId +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", lastLoginTime=" + lastLoginTime +
                 ", createAt=" + createAt +
                 ", isAdmin=" + isAdmin +
                 '}';
     }
-
 }

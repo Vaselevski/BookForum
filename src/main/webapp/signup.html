@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Sign Up</title>
     <style>
         body {
             display: flex;
@@ -21,18 +21,29 @@
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
         }
         label, input {
             margin-bottom: 10px;
+            width: 100%;
+        }
+        input[type="text"], input[type="password"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
         }
         input[type="submit"], input[type="button"] {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            background-color: #007bff;
             color: #fff;
             font-size: 16px;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
         }
         input[type="button"] {
             background-color: #6c757d;
@@ -43,13 +54,16 @@
     </style>
 </head>
 <body>
-<form action="/Login" method="post">
+<form action="/Signup" method="post">
+    <h1>Sign Up</h1>
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required>
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required>
-    <input type="submit" value="Login">
-    <input type="button" value="Register" onclick="window.location.href='/Signup'">
+    <label for="confirm-password">Confirm Password:</label>
+    <input type="password" id="confirm-password" name="confirm-password" required>
+    <input type="submit" value="Sign Up">
+    <input type="button" value="Back to Login" onclick="window.location.href='/Login'">
 </form>
 </body>
 </html>
