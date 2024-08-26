@@ -1,6 +1,7 @@
 package cn.it.web.bookforum.book;
 
 import cn.it.web.bookforum.common.DatabaseConnectionPool;
+import cn.it.web.bookforum.entityclass.Book;
 
 import java.sql.*;
 import java.util.ArrayList;

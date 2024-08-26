@@ -1,4 +1,4 @@
-package cn.it.web.bookforum.comment;
+package cn.it.web.bookforum.entityclass;
 import java.sql.Timestamp;
 
 public class Comment {

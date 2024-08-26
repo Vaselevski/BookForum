@@ -1,4 +1,4 @@
-package cn.it.web.bookforum.bookscore;
+package cn.it.web.bookforum.entityclass;
 
 public class BookScore {
     private int bookId;

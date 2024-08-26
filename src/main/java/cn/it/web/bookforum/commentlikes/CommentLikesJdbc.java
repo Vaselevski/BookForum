@@ -1,6 +1,7 @@
 package cn.it.web.bookforum.commentlikes;
 
 import cn.it.web.bookforum.common.DatabaseConnectionPool;
+import cn.it.web.bookforum.entityclass.CommentLikes;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

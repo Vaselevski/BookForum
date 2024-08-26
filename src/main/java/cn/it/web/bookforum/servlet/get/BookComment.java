@@ -1,5 +1,5 @@
 package cn.it.web.bookforum.servlet.get;
-import cn.it.web.bookforum.comment.Comment;
+import cn.it.web.bookforum.entityclass.Comment;
 import cn.it.web.bookforum.comment.CommentsServiceJdbc;
 import cn.it.web.bookforum.common.URLParser;
 import com.google.gson.Gson;
@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 //回传的*应该是要获得评论的书籍的ID
 @WebServlet("/Book/Comment/*")
-public class Book_Comment extends HttpServlet {
+public class BookComment extends HttpServlet {
     private CommentsServiceJdbc commentsService = new CommentsServiceJdbc();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

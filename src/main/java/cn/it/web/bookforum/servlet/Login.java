@@ -1,21 +1,23 @@
 package cn.it.web.bookforum.servlet;
 import cn.it.web.bookforum.common.Hash;
 import cn.it.web.bookforum.common.HttpUtils;
-import cn.it.web.bookforum.user.User;
-import cn.it.web.bookforum.user.UserServiceJdbc;
+import cn.it.web.bookforum.common.MybatisUtil;
+import cn.it.web.bookforum.mapper.UserService;
+import cn.it.web.bookforum.entityclass.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.apache.ibatis.session.SqlSession;
+
 import java.io.IOException;
 
 @WebServlet("/Login")
 public class Login extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private UserServiceJdbc userServiceJdbc = new UserServiceJdbc();
 
 
     @Override
@@ -34,8 +36,12 @@ public class Login extends HttpServlet {
             String username = request.getParameter("username");
             String password = request.getParameter("password");
 
-            Class.forName("org.postgresql.Driver");
-            User user = userServiceJdbc.seachUser(username);
+            User user;
+            try (SqlSession sqlSession = MybatisUtil.openSession(true);) {
+                UserService userJdbc = sqlSession.getMapper(UserService.class);
+                user = userJdbc.searchUserByUsername(username);
+            }
+
             Hash hash = new Hash();
             if (user == null) {
                 doGet(request, response);
@@ -45,7 +51,8 @@ public class Login extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("user", user);
                 response.sendRedirect("/Home");
-            }else{
+                System.out.println(user.getUsername());
+            } else {
                 doGet(request, response);
             }
         } catch (NumberFormatException e) {

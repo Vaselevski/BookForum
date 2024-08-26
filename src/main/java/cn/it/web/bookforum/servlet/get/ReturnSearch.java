@@ -1,13 +1,18 @@
 package cn.it.web.bookforum.servlet.get;
-import cn.it.web.bookforum.book.Book;
+import cn.it.web.bookforum.common.MybatisUtil;
+import cn.it.web.bookforum.entityclass.Book;
 import cn.it.web.bookforum.book.BookServiceJdbc;
 import cn.it.web.bookforum.common.URLParser;
+import cn.it.web.bookforum.mapper.Bookjdbc;
+import cn.it.web.bookforum.mapper.UserService;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.ibatis.session.SqlSession;
+
 import java.net.URLDecoder;
 
 import java.io.IOException;
@@ -23,12 +28,11 @@ public class ReturnSearch extends HttpServlet {
         URLParser urlParser = new URLParser();
         String search = urlParser.extractContentAfterString(req, "/ReturnSearch");
          search = URLDecoder.decode(search, "UTF-8");
-        System.out.println(search);
+
         List<Book> books;
-        try {
-            books = bookServiceJdbc.searchBooks(search);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        try (SqlSession sqlSession = MybatisUtil.openSession(true);) {
+            Bookjdbc bookjdbc = sqlSession.getMapper(Bookjdbc.class);
+            books = bookjdbc.searchBooks(search);
         }
         Gson gson = new Gson();
         String jsonBook = gson.toJson(books);
