@@ -2,7 +2,7 @@ package cn.it.web.bookforum.servlet.redirect;
 
 import cn.it.web.bookforum.common.HttpUtils;
 import jakarta.servlet.http.HttpServlet;
-import cn.it.web.bookforum.user.User;
+import cn.it.web.bookforum.entityclass.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;

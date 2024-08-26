@@ -1,6 +1,7 @@
 package cn.it.web.bookforum.user;
 
 import cn.it.web.bookforum.common.DatabaseConnectionPool;
+import cn.it.web.bookforum.entityclass.User;
 
 import java.sql.*;
 

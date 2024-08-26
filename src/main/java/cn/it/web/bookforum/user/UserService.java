@@ -1,5 +1,7 @@
 package cn.it.web.bookforum.user;
 
+import cn.it.web.bookforum.entityclass.User;
+
 import java.sql.SQLException;
 
 public interface UserService {

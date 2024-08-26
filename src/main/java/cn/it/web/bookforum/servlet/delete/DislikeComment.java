@@ -1,9 +1,9 @@
 package cn.it.web.bookforum.servlet.delete;
 
-import cn.it.web.bookforum.commentlikes.CommentLikes;
+import cn.it.web.bookforum.entityclass.CommentLikes;
 import cn.it.web.bookforum.commentlikes.CommentLikesJdbc;
 import cn.it.web.bookforum.common.URLParser;
-import cn.it.web.bookforum.user.User;
+import cn.it.web.bookforum.entityclass.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

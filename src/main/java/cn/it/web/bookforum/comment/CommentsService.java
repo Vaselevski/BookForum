@@ -1,5 +1,7 @@
 package cn.it.web.bookforum.comment;
 
+import cn.it.web.bookforum.entityclass.Comment;
+
 import java.sql.SQLException;
 import java.util.List;
 

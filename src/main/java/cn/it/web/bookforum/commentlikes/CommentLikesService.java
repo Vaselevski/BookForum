@@ -1,5 +1,7 @@
 package cn.it.web.bookforum.commentlikes;
 
+import cn.it.web.bookforum.entityclass.CommentLikes;
+
 import java.sql.SQLException;
 
 public interface CommentLikesService {

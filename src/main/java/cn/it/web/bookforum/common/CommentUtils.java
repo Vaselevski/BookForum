@@ -1,6 +1,6 @@
 package cn.it.web.bookforum.common;
 
-import cn.it.web.bookforum.comment.Comment;
+import cn.it.web.bookforum.entityclass.Comment;
 
 import java.util.ArrayList;
 import java.util.HashMap;

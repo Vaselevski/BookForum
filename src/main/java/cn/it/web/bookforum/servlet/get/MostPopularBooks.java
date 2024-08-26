@@ -1,6 +1,6 @@
 package cn.it.web.bookforum.servlet.get;
 import cn.it.web.bookforum.book.BookServiceJdbc;
-import cn.it.web.bookforum.book.Book;
+import cn.it.web.bookforum.entityclass.Book;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

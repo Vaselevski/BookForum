@@ -1,5 +1,7 @@
 package cn.it.web.bookforum.book;
 
+import cn.it.web.bookforum.entityclass.Book;
+
 import java.sql.SQLException;
 import java.util.List;
 

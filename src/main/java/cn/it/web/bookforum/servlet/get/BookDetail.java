@@ -1,6 +1,7 @@
 package cn.it.web.bookforum.servlet.get;
-import cn.it.web.bookforum.comment.Comment;
-import cn.it.web.bookforum.comment.CommentsServiceJdbc;
+import cn.it.web.bookforum.book.BookService;
+import cn.it.web.bookforum.book.BookServiceJdbc;
+import cn.it.web.bookforum.entityclass.Book;
 import cn.it.web.bookforum.common.URLParser;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
@@ -12,23 +13,22 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.List;
-//回传的*应该是要获得评论的书籍的ID
-@WebServlet("/Book/Comment/*")
-public class Book_Comment extends HttpServlet {
-    private CommentsServiceJdbc commentsService = new CommentsServiceJdbc();
+//回传的*应该是要展示的书籍的ID
+@WebServlet("/Book/Detail/*")
+public class BookDetail extends HttpServlet {
+    private BookService bookService=new BookServiceJdbc();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        URLParser urlParser = new URLParser();
-        Integer bookID = Integer.valueOf(urlParser.extractContentAfterString(req, "/Book/Comment"));
-        List<Comment> comments;
+        URLParser urlParser=new URLParser();
+        Integer bookID= Integer.valueOf(urlParser.extractContentAfterString(req,"/Book/Detail"));
+        Book book;
         try {
-            comments = commentsService.searchCommentsByTime(bookID);
+            book = bookService.getBook(bookID);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         Gson gson = new Gson();
-        String jsonBook = gson.toJson(comments);
+        String jsonBook = gson.toJson(book);
 
 
         resp.setContentType("application/json");
@@ -37,5 +37,7 @@ public class Book_Comment extends HttpServlet {
         PrintWriter out = resp.getWriter();
         out.print(jsonBook);
         out.flush();
+
+        System.out.println("book request successful");
     }
 }

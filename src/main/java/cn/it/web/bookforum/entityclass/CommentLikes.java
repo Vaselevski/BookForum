@@ -1,4 +1,4 @@
-package cn.it.web.bookforum.commentlikes;
+package cn.it.web.bookforum.entityclass;
 
 public class CommentLikes {
     private int userid;

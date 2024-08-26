@@ -1,5 +1,5 @@
 package cn.it.web.bookforum.servlet.get;
-import cn.it.web.bookforum.book.Book;
+import cn.it.web.bookforum.entityclass.Book;
 import cn.it.web.bookforum.book.BookServiceJdbc;
 import cn.it.web.bookforum.common.URLParser;
 import com.google.gson.Gson;

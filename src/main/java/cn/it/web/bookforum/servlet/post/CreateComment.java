@@ -1,10 +1,9 @@
 package cn.it.web.bookforum.servlet.post;
 
-import cn.it.web.bookforum.comment.Comment;
+import cn.it.web.bookforum.entityclass.Comment;
 import cn.it.web.bookforum.comment.CommentsServiceJdbc;
-import cn.it.web.bookforum.common.Hash;
 import cn.it.web.bookforum.common.URLParser;
-import cn.it.web.bookforum.user.User;
+import cn.it.web.bookforum.entityclass.User;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

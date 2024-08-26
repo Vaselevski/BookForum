@@ -1,4 +1,4 @@
-package cn.it.web.bookforum.user;
+package cn.it.web.bookforum.entityclass;
 
 import java.sql.Timestamp;
 
