@@ -5,16 +5,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class URLParser {
-
-    /**
-     * 从当前 URL 中提取指定字符串后的内容
-     * @param request HttpServletRequest 对象
-     * @param targetString 需要解析的目标字符串（例如 "/ddd/xxx"）
-     * @return 指定字符串后的内容，如果没有找到则返回 null
-     */
+    //从当前URL中获取指定字符串之后的内容
     public static String extractContentAfterString(HttpServletRequest request, String targetString) {
         String path = request.getRequestURI();
-
         String regex = Pattern.quote(targetString) + "/(.*)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(path);

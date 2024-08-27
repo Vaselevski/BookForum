@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface Bookjdbc {
+public interface BookService {
     @Delete("DELETE FROM books WHERE book_id = #{id}")
     void deleteBookById(@Param("id") int id);
     @Select("SELECT * FROM books WHERE book_name ILIKE '%' || #{search} || '%' OR book_author ILIKE '%' || #{search} || '%' ORDER BY book_score DESC")

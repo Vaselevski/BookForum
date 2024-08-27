@@ -3,11 +3,8 @@ package cn.it.web.bookforum.common;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
-
+//在服务器启动时创建一个用于mybatis查询的sqlSessionFactory，并且在之后调用方法时返回用于查询session
 public class MybatisUtil {
     private static SqlSessionFactory sqlSessionFactory;
     static {
@@ -17,18 +14,5 @@ public class MybatisUtil {
     public static SqlSession openSession(boolean autoCommit){
         return sqlSessionFactory.openSession(autoCommit);
     }
-    public static void main(String[] args) {
-        // 调用 openSession 并开启自动提交
-        try (SqlSession session = MybatisUtil.openSession(true)) {
-            if (session != null) {
-                System.out.println("SqlSession successfully open");
-            } else {
-                System.out.println("SqlSession did not open");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 }
 

@@ -1,4 +1,8 @@
 package cn.it.web.bookforum.entityclass;
+import cn.it.web.bookforum.common.MybatisUtil;
+import cn.it.web.bookforum.mapper.CommentService;
+import org.apache.ibatis.session.SqlSession;
+
 import java.sql.Timestamp;
 
 public class Comment {
@@ -96,5 +100,6 @@ public class Comment {
                 ", comment='" + comment + '\'' +
                 '}';
     }
+
 }
 

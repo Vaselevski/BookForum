@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>评论系统</title>
+    <link rel="stylesheet" href="//unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css">
+    <script src="//unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="//unpkg.com/element-ui@2.15.14/lib/index.js"></script>
+    <style>
+        .comment-container {
+            margin-bottom: 20px;
+        }
+        .comment-header {
+            cursor: pointer;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .comment-body {
+            padding: 10px;
+            border-left: 2px solid #ddd;
+            margin-left: 20px;
+        }
+        .comment-box {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- 全局评论框 -->
+    <el-form :model="newComment" class="comment-box" label-width="100px">
+        <el-form-item label="评论">
+            <el-input type="textarea" v-model="newComment.text" placeholder="请输入评论内容"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitComment">提交评论</el-button>
+        </el-form-item>
+    </el-form>
+
+    <!-- 评论列表 -->
+    <div v-for="(comment, index) in comments" :key="comment.commentId" class="comment-container">
+        <div class="comment-header" @click="toggleVisibility(index)">
+            <h4>{{ comment.username }} - {{ comment.commentCreateAt }}</h4>
+            <p>{{ comment.comment }}</p>
+        </div>
+        <div v-show="visibleCommentIndex === index" class="comment-body">
+            <div v-for="child in comment.children" :key="child.commentId">
+                <h5>{{ child.username }} - {{ child.commentCreateAt }}</h5>
+                <p>{{ child.comment }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                newComment: {
+                    text: ''
+                },
+                comments: [], // 这里需要从后端获取评论数据
+                visibleCommentIndex: null
+            };
+        },
+        methods: {
+            async submitComment() {
+                try {
+                    const response = await fetch('aaaa/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ text: this.newComment.text })
+                    });
+                    if (response.ok) {
+                        this.newComment.text = '';
+                        this.fetchComments();
+                    } else {
+                        alert('提交失败');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('提交失败');
+                }
+            },
+            toggleVisibility(index) {
+                this.visibleCommentIndex = this.visibleCommentIndex === index ? null : index;
+            },
+            async fetchComments() {
+                try {
+                    const response = await fetch('your-backend-url-to-get-comments');
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.comments = data.comments;
+                    } else {
+                        console.error('Failed to fetch comments');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        },
+        created() {
+            this.fetchComments();
+        }
+    });
+</script>
+</body>
+</html>
+

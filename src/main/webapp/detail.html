@@ -1,192 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Details</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .search-box {
-      margin-bottom: 20px;
-    }
-    .search-box input[type="text"] {
-      width: 80%;
-      padding: 10px;
-      font-size: 16px;
-    }
-    .search-box input[type="submit"] {
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-    .book-details {
-      margin-bottom: 20px;
-    }
-    .comment-section {
-      margin-top: 20px;
-    }
-    .comment-box {
-      width: calc(100% - 100px);
-      padding: 10px;
-      font-size: 16px;
-      margin-right: 10px;
-      box-sizing: border-box;
-    }
-    .submit-button {
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-    .comment {
-      border-bottom: 1px solid #ddd;
-      padding: 10px 0;
-    }
-    .comment .like-button {
-      cursor: pointer;
-      color: red;
-      font-size: 20px;
-    }
-    .comment .like-button.liked {
-      color: darkred;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details</title>
+    <link rel="stylesheet" href="//unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css">
+    <script src="//unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="//unpkg.com/element-ui@2.15.14/lib/index.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search-box form {
+            display: flex;
+            width: 100%;
+            max-width: 600px;
+        }
+        .search-box input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            box-sizing: border-box;
+        }
+        .search-box input[type="submit"] {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-left: none;
+            border-radius: 0 5px 5px 0;
+            background-color: #409EFF;
+            color: white;
+            cursor: pointer;
+        }
+        .search-box input[type="submit"]:hover {
+            background-color: #66b1ff;
+        }
+        .book-details {
+            margin-bottom: 20px;
+        }
+        .comment-section {
+            margin-top: 20px;
+        }
+        .comment-box {
+            width: calc(100% - 100px);
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            box-sizing: border-box;
+        }
+        .submit-button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .comment-container {
+            margin-bottom: 20px;
+        }
+        .comment-header {
+            cursor: pointer;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .comment-body {
+            padding: 10px;
+            border-left: 2px solid #ddd;
+            margin-left: 20px;
+        }
+        .comment {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .comment .like-button {
+            cursor: pointer;
+            color: red;
+            font-size: 20px;
+        }
+        .comment .like-button.liked {
+            color: darkred;
+        }
+    </style>
 </head>
 <body onload="fetchBookDetails()">
 <div class="container">
-  <div class="search-box">
-    <form id="search-form" onsubmit="handleSearch(event)">
-      <input type="text" id="search-input" name="query" placeholder="Search...">
-      <input type="submit" value="Search">
-    </form>
-  </div>
+    <!-- Search Box -->
+    <div class="search-box">
+        <form id="search-form" onsubmit="handleSearch(event)">
+            <input type="text" id="search-input" name="query" placeholder="Search...">
+            <input type="submit" value="Search">
+        </form>
+    </div>
 
-  <!-- Book Details -->
-  <div id="book-details" class="book-details"></div>
+    <!-- Book Details -->
+    <div id="book-details" class="book-details"></div>
 
-  <!-- Comment Section -->
-  <div class="comment-section">
-    <textarea id="comment-box" class="comment-box" placeholder="Write a comment..."></textarea>
-    <button class="submit-button" onclick="submitComment()">Submit</button>
-    <div id="comments-list"></div>
-  </div>
+    <!-- Comment Section -->
+    <div id="app" class="comment-section">
+        <el-form :model="newComment" label-width="100px">
+            <el-form-item label="评论">
+                <el-input type="textarea" v-model="newComment.text" placeholder="请输入评论内容"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitComment">提交评论</el-button>
+            </el-form-item>
+        </el-form>
+        <div v-for="(comment, index) in comments" :key="comment.commentId" class="comment-container">
+            <div class="comment-header" @click="toggleVisibility(index)">
+                <h4>{{ comment.username }} - {{ comment.commentCreateAt }}</h4>
+                <p>{{ comment.comment }}</p>
+            </div>
+            <div v-show="visibleCommentIndex === index" class="comment-body">
+                <div v-for="child in comment.children" :key="child.commentId">
+                    <h5>{{ child.username }} - {{ child.commentCreateAt }}</h5>
+                    <p>{{ child.comment }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-  function handleSearch(event) {
-    event.preventDefault(); // Prevent the default form submission
-    const input = document.getElementById('search-input');
-    const query = encodeURIComponent(input.value.trim()); // Get and encode the input value
-    if (query) {
-      window.location.href = `/search/${query}`; // Redirect to the new URL
-    }
-  }
-
-  function getBookIdFromUrl() {
-    const path = window.location.pathname;
-    const match = path.match(/\/BookDetail\/(\d+)/);
-    return match ? match[1] : null;
-  }
-
-  function fetchBookDetails() {
-    const bookId = getBookIdFromUrl();
-    if (bookId) {
-      fetch(`/Book/Detail/${bookId}`)
-              .then(response => response.json())
-              .then(book => {
-                const bookDetails = document.getElementById('book-details');
-                bookDetails.innerHTML = `
-            <h1>${book.bookName}</h1>
-            <p><strong>作者:</strong> ${book.bookAuthor}</p>
-            <p><strong>出版社:</strong> ${book.bookPublisher}</p>
-            <p><strong>出版年份:</strong> ${book.bookPublicationYear}</p>
-            <p><strong>价格:</strong> ${book.bookPrice}</p>
-            <p><strong>类型:</strong> ${book.bookType}</p>
-            <p><strong>评价人数:</strong> ${book.bookRatePeople}</p>
-            <p><strong>评分:</strong> ${book.bookScore}</p>
-            <p><strong>简介:</strong> ${book.bookIntroduction}</p>
-            <p><strong>作者简介:</strong> ${book.bookAuthorIntroduction}</p>
-          `;
-                fetchComments(bookId);
-              })
-              .catch(error => console.error('Error fetching book details:', error));
-    } else {
-      console.error('Book ID not found in URL');
-    }
-  }
-
-  function fetchComments(bookId) {
-    fetch(`/comment/${bookId}`)
-            .then(response => response.json())
-            .then(comments => {
-              const commentsList = document.getElementById('comments-list');
-              commentsList.innerHTML = '';
-              comments.forEach(comment => {
-                const commentDiv = document.createElement('div');
-                commentDiv.className = 'comment';
-                commentDiv.innerHTML = `
-            <p><strong>${comment.username}</strong> <span>${new Date(comment.commentCreateAt).toLocaleString()}</span></p>
-            <p>${comment.comment}</p>
-            <p>Likes: ${comment.commentLikesCount}</p>
-            <span class="like-button" data-id="${comment.commentId}" onclick="toggleLike(this)">❤️</span>
-          `;
-                commentsList.appendChild(commentDiv);
-              });
-            })
-            .catch(error => console.error('Error fetching comments:', error));
-  }
-
-  function submitComment() {
-    const bookId = getBookIdFromUrl();
-    const commentBox = document.getElementById('comment-box');
-    const commentContent = commentBox.value;
-
-    if (bookId && commentContent) {
-      fetch(`/comment/${bookId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                newComment: {
+                    text: '',
+                },
+                comments: [],
+                visibleCommentIndex: null,
+                bookId: null
+            };
         },
-        body: JSON.stringify({
-          parentCommentId: null,
-          bookId: bookId,
-          comment: commentContent
-        })
-      })
-              .then(response => response.json())
-              .then(() => {
-                commentBox.value = '';
-                fetchComments(bookId);
-              })
-              .catch(error => console.error('Error submitting comment:', error));
+        methods: {
+            async submitComment() {
+                try {
+                    const formData = new FormData();
+                    formData.append('text', this.newComment.text);
+                    formData.append('bookId', this.bookId);
+                    formData.append('parentId', this.parentId);
+
+                    const response = await fetch(`/CreateComment/${this.bookId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams(formData)
+                    });
+
+                    if (response.ok) {
+                        this.newComment.text = '';
+                        this.fetchComments();
+                    } else {
+                        alert('提交失败');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('提交失败');
+                }
+            },
+            toggleVisibility(index) {
+                this.visibleCommentIndex = this.visibleCommentIndex === index ? null : index;
+            },
+            async fetchComments() {
+                try {
+                    const response = await fetch(`/Book/Comments/${this.bookId}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.comments = data.comments;
+                    } else {
+                        console.error('Failed to fetch comments');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            },
+            async fetchBookDetails() {
+                this.bookId = getBookIdFromUrl();
+                if (this.bookId) {
+                    try {
+                        const response = await fetch(`/Book/Detail/${this.bookId}`);
+                        if (response.ok) {
+                            const book = await response.json();
+                            const bookDetails = document.getElementById('book-details');
+                            bookDetails.innerHTML = `
+                <h1>${book.bookName}</h1>
+                <p><strong>作者:</strong> ${book.bookAuthor}</p>
+                <p><strong>出版社:</strong> ${book.bookPublisher}</p>
+                <p><strong>出版年份:</strong> ${book.bookPublicationYear}</p>
+                <p><strong>价格:</strong> ${book.bookPrice}</p>
+                <p><strong>类型:</strong> ${book.bookType}</p>
+                <p><strong>评价人数:</strong> ${book.bookRatePeople}</p>
+                <p><strong>评分:</strong> ${book.bookScore}</p>
+                <p><strong>简介:</strong> ${book.bookIntroduction}</p>
+                <p><strong>作者简介:</strong> ${book.bookAuthorIntroduction}</p>
+              `;
+                            this.fetchComments();
+                        } else {
+                            console.error('Failed to fetch book details');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                } else {
+                    console.error('Book ID not found in URL');
+                }
+            }
+        },
+        created() {
+            this.fetchBookDetails();
+        }
+    });
+
+    function handleSearch(event) {
+        event.preventDefault(); // Prevent the default form submission
+        const input = document.getElementById('search-input');
+        const query = encodeURIComponent(input.value.trim()); // Get and encode the input value
+        if (query) {
+            window.location.href = `/search/${query}`; // Redirect to the new URL
+        }
     }
-  }
 
-  function toggleLike(button) {
-    const commentId = button.getAttribute('data-id');
-
-    fetch(`/verify/${commentId}`)
-            .then(response => response.json())
-            .then(isLiked => {
-              const url = isLiked ? `/dislikes/${commentId}` : `/likes/${commentId}`;
-              fetch(url, {
-                method: 'POST'
-              })
-                      .then(() => {
-                        button.classList.toggle('liked');
-                        button.innerHTML = button.classList.contains('liked') ? '❤️' : '❤️';
-                        fetchComments(getBookIdFromUrl());
-                      })
-                      .catch(error => console.error('Error toggling like:', error));
-            })
-            .catch(error => console.error('Error verifying like:', error));
-  }
+    function getBookIdFromUrl() {
+        const path = window.location.pathname;
+        const match = path.match(/\/BookDetail\/(\d+)/);
+        return match ? match[1] : null;
+    }
 </script>
 </body>
 </html>
